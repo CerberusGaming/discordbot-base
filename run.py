@@ -1,4 +1,4 @@
-from App import app
+from App import app, TOKEN
 
 if __name__ == "__main__":
-    app.run_forever()
+    app.run(TOKEN)

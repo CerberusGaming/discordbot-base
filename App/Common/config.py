@@ -1,8 +1,56 @@
-from os import getenv as _getenv
-from os import getcwd as _getcwd
-from os.path import normpath as _normpath
+from App.Models.settings import Settings
+from App.Common.storage import Session
 
-TOKEN: str = _getenv("TOKEN", "")
-DB_URI: str = _getenv("DB_URI", "sqlite:///" + (_normpath(_getcwd() + "/app.db")))
 
-PREFIX: str = _getenv("PREFIX", "!")
+def _get_setting(name: str):
+    name = name.lower()
+    ses = Session()
+    query = ses.query(Settings).filter(Settings.name == name)
+    if query.count() == 1:
+        return query.one().value
+    else:
+        return None
+
+
+def _set_setting(name: str, value: str = None):
+    name = name.lower()
+    ses = Session()
+    query = ses.query(Settings).filter(Settings.name == name)
+    if query.count() == 0:
+        ses.add(Settings(name=name, value=value))
+        ses.commit()
+        return value
+    else:
+        return None
+
+
+def _del_setting(name: str):
+    name = name.lower()
+    ses = Session()
+    return ses.query(Settings).filter(Settings.name == name).delete(synchronize_session='fetch')
+
+
+def get_setting(name: str, default: str = None):
+    get = _get_setting(name)
+    if get is None:
+        _del_setting(name)
+        _set_setting(name, default)
+        return default
+    else:
+        return get
+
+
+def set_setting(name: str, value: str = None):
+    return _set_setting(name, value)
+
+
+def update_setting(name: str, value: str = None):
+    name = name.lower()
+    ses = Session()
+    query = ses.query(Settings).filter(Settings.name == name)
+    if query.count() == 1:
+        query.one().value = value
+        ses.commit()
+        return value
+    else:
+        return None
