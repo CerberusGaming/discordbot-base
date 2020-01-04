@@ -1,5 +1,15 @@
-from App.Models.settings import Settings
 from App.Common.storage import Session
+from sqlalchemy import Column, String
+from App.Common.storage import Base
+
+
+class Settings(Base):
+    __tablename__ = "settings"
+    name = Column(String(64), unique=True, primary_key=True)
+    value = Column(String(256))
+
+
+Base.metadata.create_all()
 
 
 def _get_setting(name: str):
