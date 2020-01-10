@@ -1,66 +1,37 @@
-from App.Common.storage import Session
-from sqlalchemy import Column, String
-from App.Common.storage import Base
+from os import getenv as _getenv
+from os import getcwd as _getcwd
+from os.path import normpath as _normpath
+from os.path import isfile as _isfile
+from configparser import ConfigParser as _CP
+
+_configfile = _CP()
+_path = _normpath(_getcwd() + "/config.ini")
+if _isfile(_path):
+    _configfile.read(_path)
+else:
+    _configfile.add_section('db')
+    _configfile.add_section('bot')
+    _configfile.set('bot', 'prefix', '')
+    _configfile.set('bot', 'token', '')
+    _configfile.set('db', 'uri', '')
+    with open(_path, 'w') as fp:
+        _configfile.write(fp)
+        fp.close()
+    exit()
 
 
-class Settings(Base):
-    __tablename__ = "settings"
-    name = Column(String(64), unique=True, primary_key=True)
-    value = Column(String(256))
+def _setting(section, option, env, default=""):
+    value = _configfile.get(section, option, fallback="")
+    if len(value) == 0:
+        value = default
+    return _getenv(env, value)
 
 
-Base.metadata.create_all()
+# SQLA DB URI
+DB_URI = _setting('db', 'uri', 'DB_URI', "sqlite:///" + (_normpath(_getcwd() + "/app.db")))
 
+# Bot Command Prefix: ! -> "!Command <option>"
+BOT_PREFIX = _setting('bot', 'prefix', 'BOT_PREFIX', '!')
 
-def _get_setting(name: str):
-    name = name.lower()
-    ses = Session()
-    query = ses.query(Settings).filter(Settings.name == name)
-    if query.count() == 1:
-        return query.one().value
-    else:
-        return None
-
-
-def _set_setting(name: str, value: str = None):
-    name = name.lower()
-    ses = Session()
-    query = ses.query(Settings).filter(Settings.name == name)
-    if query.count() == 0:
-        ses.add(Settings(name=name, value=value))
-        ses.commit()
-        return value
-    else:
-        return None
-
-
-def _del_setting(name: str):
-    name = name.lower()
-    ses = Session()
-    return ses.query(Settings).filter(Settings.name == name).delete(synchronize_session='fetch')
-
-
-def get_setting(name: str, default: str = None):
-    get = _get_setting(name)
-    if get is None:
-        _del_setting(name)
-        _set_setting(name, default)
-        return default
-    else:
-        return get
-
-
-def set_setting(name: str, value: str = None):
-    return _set_setting(name, value)
-
-
-def update_setting(name: str, value: str = None):
-    name = name.lower()
-    ses = Session()
-    query = ses.query(Settings).filter(Settings.name == name)
-    if query.count() == 1:
-        query.one().value = value
-        ses.commit()
-        return value
-    else:
-        return None
+# Discord Bot API Token
+BOT_TOKEN = _setting('bot', 'token', 'BOT_TOKEN', '')
