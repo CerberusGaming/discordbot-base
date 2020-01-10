@@ -1,12 +1,13 @@
-from os import getenv, getcwd
-from os.path import normpath
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
-
-Engine = create_engine(getenv("DB_URI", "sqlite:///" + (normpath(getcwd() + "/app.db"))))
-Base = declarative_base(bind=Engine)
+from discord.ext.commands import Cog
 
 
-def Session(engine=Engine):
-    return scoped_session(sessionmaker(bind=engine))()
+class Storage(Cog):
+    def __init__(self):
+        self.engine = create_engine()
+        self.model_base = declarative_base(bind=self.engine)
+
+    def gen_session(self):
+        return scoped_session(sessionmaker(bind=self.engine))()
