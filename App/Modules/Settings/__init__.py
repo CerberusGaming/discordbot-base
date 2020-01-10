@@ -1,8 +1,10 @@
 from discord.ext import commands
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, Integer
 
 
 class Settings(commands.Cog, name="Settings"):
+    deps = ['Storage']
+
     def __init__(self, bot):
         self.bot = bot
         self.storage = bot.get_cog('Storage')
@@ -12,55 +14,38 @@ class Settings(commands.Cog, name="Settings"):
     def __gen_model__(self):
         class SettingsModel(self.storage.model_base):
             __tablename__ = "settings"
-            name = Column(String(64), unique=True, primary_key=True)
-            value = Column(String(256))
+            id = Column(Integer, primary_key=True, autoincrement=True)
+            module = Column(String(64))
+            setting = Column(String(64))
+            value = Column(String(4096))
 
         return SettingsModel
 
-    def _get_setting(self, name: str):
-        name = name.lower()
+    def get(self, module: str, setting: str = None):
         ses = self.storage.gen_session()
-        query = ses.query(self.model).filter(self.model.name == name)
-        if query.count() == 1:
-            return query.one().value
-        else:
-            return None
+        value = ses.query(self.model).filter(self.model.module == module)
+        value = value.filter(self.model.setting == setting) if setting is not None else value
+        value = value.all() if value.count() > 0 else None
+        return value
 
-    def _set_setting(self, name: str, value: str = None):
-        name = name.lower()
+    def set(self, module: str, setting: str, value: str):
+        value = str(value)
         ses = self.storage.gen_session()
-        query = ses.query(self.model).filter(self.model.name == name)
-        if query.count() == 0:
-            ses.add(self.model(name=name, value=value))
+        check = ses.query(self.model).filter(self.model.module == module).filter(self.model.setting == setting)
+        if check.count() == 0:
+            ses.add(self.model(module=module, setting=setting, value=value))
             ses.commit()
-            return value
-        else:
-            return None
-
-    def _del_setting(self, name: str):
-        name = name.lower()
-        ses = self.storage.gen_session()
-        return ses.query(self.model).filter(self.model.name == name).delete(synchronize_session='fetch')
-
-    def get_setting(self, name: str, default: str = None):
-        get = self._get_setting(name)
-        if get is None:
-            self._del_setting(name)
-            self._set_setting(name, default)
-            return default
-        else:
-            return get
-
-    def set_setting(self, name: str, value: str = None):
-        return self._set_setting(name, value)
-
-    def update_setting(self, name: str, value: str = None):
-        name = name.lower()
-        ses = self.storage.gen_session()
-        query = ses.query(self.model).filter(self.model.name == name)
-        if query.count() == 1:
-            query.one().value = value
+            return True
+        if check.count() == 1:
+            check.one().value = value
             ses.commit()
-            return value
+            return True
         else:
-            return None
+            return False
+
+    def rem(self, module, setting):
+        ses = self.storage.gen_session()
+        check = ses.query(self.model).filter(self.model.module == module).filter(self.model.setting == setting)
+        records = check.delete(synchronize_session='fetch')
+        ses.commit()
+        return records

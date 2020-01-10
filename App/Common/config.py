@@ -1,37 +1,45 @@
-from os import getenv as _getenv
-from os import getcwd as _getcwd
-from os.path import normpath as _normpath
-from os.path import isfile as _isfile
-from configparser import ConfigParser as _CP
-
-_configfile = _CP()
-_path = _normpath(_getcwd() + "/config.ini")
-if _isfile(_path):
-    _configfile.read(_path)
-else:
-    _configfile.add_section('db')
-    _configfile.add_section('bot')
-    _configfile.set('bot', 'prefix', '')
-    _configfile.set('bot', 'token', '')
-    _configfile.set('db', 'uri', '')
-    with open(_path, 'w') as fp:
-        _configfile.write(fp)
-        fp.close()
-    exit()
+import os
+from configparser import ConfigParser
 
 
-def _setting(section, option, env, default=""):
-    value = _configfile.get(section, option, fallback="")
-    if len(value) == 0:
-        value = default
-    return _getenv(env, value)
+class Config():
+    @staticmethod
+    def getenv(env, fallback):
+        return os.getenv(env, fallback)
 
+    def __init__(self, path: str = None):
+        self._cp = ConfigParser()
+        if path is None:
+            path = os.path.normpath(os.getcwd() + "/config.ini")
+            if os.path.isfile(path):
+                self._cp.read(path)
+            else:
+                open(path, 'w').close()
+        self.path = path
 
-# SQLA DB URI
-DB_URI = _setting('db', 'uri', 'DB_URI', "sqlite:///" + (_normpath(_getcwd() + "/app.db")))
+    def _write(self):
+        with open(self.path, 'w') as fp:
+            self._cp.write(fp)
+            fp.close()
 
-# Bot Command Prefix: ! -> "!Command <option>"
-BOT_PREFIX = _setting('bot', 'prefix', 'BOT_PREFIX', '!')
+    def init_module(self, module: str, defaults: dict = None):
+        if defaults is None:
+            defaults = {}
+        module = module.lower()
+        if not self._cp.has_section(module):
+            self._cp.read_dict({module: defaults})
+            self._write()
+        elif len([x for x in self._cp.options(module) if x in defaults.keys()]) > 0:
+            for key, value in defaults.items():
+                if not self._cp.has_option(module, key):
+                    self._cp.set(module, key, value)
+            self._write()
+        else:
+            return True
+        return False
 
-# Discord Bot API Token
-BOT_TOKEN = _setting('bot', 'token', 'BOT_TOKEN', '')
+    def get_setting(self, section, option, env, default=""):
+        value = self._cp.get(section, option, fallback="")
+        if len(value) == 0:
+            value = default
+        return self.getenv(env, value)
