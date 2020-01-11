@@ -14,6 +14,6 @@ RUN apk --no-cache add --virtual build postgresql-dev gcc python3-dev musl-dev g
     && pip install psycopg2-binary \
     && apk del build \
     && apk --no-cache add postgresql-libs \
-    && pip -r install requirements.txt
+    && pip install -r requirements.txt
 
 CMD python3 ./bot.py
