@@ -5,7 +5,7 @@ ENV DB_URI sqlite///./test.db
 
 WORKDIR /usr/src/gunbrokerbot
 
-COPY App/* ./App/
+COPY App ./App
 COPY bot.py ./
 COPY requirements.txt ./
 
