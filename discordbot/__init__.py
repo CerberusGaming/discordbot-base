@@ -17,12 +17,12 @@ class DiscordBot(Bot):
         self.config = Config()
         self.config.init_module('bot', defaults={'prefix': '', 'token': '!'})
 
+        super().__init__(command_prefix=self.config.get_setting('bot', 'prefix', 'BOT_PREFIX', '!'))
+
         self.add_cog(Storage(self))
         self.add_cog(Settings(self))
 
         self.load_modules()
-
-        super().__init__(command_prefix=self.config.get_setting('bot', 'prefix', 'BOT_PREFIX', '!'))
 
     def load_modules(self):
         paths = ['discordbot/Modules', 'Modules']
