@@ -15,7 +15,7 @@ class DiscordBot(Bot):
         self.config = Config()
         self._can_run = self.config.init_module('Bot', defaults={'prefix': '!', 'token': ''})
 
-        super().__init__(command_prefix=self.config.get_setting('bot', 'prefix', 'BOT_PREFIX', '!'))
+        super().__init__(command_prefix=self.config.get_setting('Bot', 'prefix', 'BOT_PREFIX', '!'))
 
         self.add_cog(Storage(self))
         self.add_cog(Settings(self))
@@ -66,4 +66,4 @@ class DiscordBot(Bot):
 
     def run(self, *args, **kwargs):
         if self._can_run:
-            super().run(self.config.get_setting('bot', 'token', 'BOT_TOKEN', ''), *args, **kwargs)
+            super().run(self.config.get_setting('Bot', 'token', 'BOT_TOKEN', ''), *args, **kwargs)
