@@ -11,8 +11,8 @@ setup(name='discordbot-base',
           'discord.py',
           'sqlalchemy'
       ],
-      packages=['.',
-                'Common',
-                'Modules',
-                'Modules.Settings',
-                'Modules.Storage'])
+      packages=['discordbot-base',
+                'discordbot-base.Common',
+                'discordbot-base.Modules',
+                'discordbot-base.Modules.Settings',
+                'discordbot-base.Modules.Storage'])
