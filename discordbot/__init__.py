@@ -1,11 +1,12 @@
-import os
 import importlib
-import inspect
+import os
 from glob import glob
-from discord.ext.commands.bot import Bot
+
 from discord.ext.commands import CogMeta, Cog
+from discord.ext.commands.bot import Bot
 
 from .Common.config import Config
+from .Modules import Settings, Storage
 
 
 class DiscordBot(Bot):
@@ -15,6 +16,10 @@ class DiscordBot(Bot):
         self.debug = debug
 
         super().__init__(command_prefix=self.config.get_setting('bot', 'prefix', 'BOT_PREFIX', '!'))
+
+    def _load_internal_modules(self):
+        self.add_cog(Storage(self))
+        self.add_cog(Settings(self))
 
     def load_modules(self):
         paths = ['discordbot/Modules', 'Modules']
@@ -66,6 +71,7 @@ class DiscordBot(Bot):
         return loaded
 
     def run(self, *args, **kwargs):
+        self._load_internal_modules()
         modules = self.load_modules()
         if self.debug:
             print(modules)
