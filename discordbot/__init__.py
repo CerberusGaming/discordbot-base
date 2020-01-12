@@ -5,8 +5,9 @@ from glob import glob
 from discord.ext.commands import CogMeta, Cog
 from discord.ext.commands.bot import Bot
 
-from .Common.config import Config
-from .Modules import Settings, Storage
+from discordbot.Common.config import Config
+from discordbot.Modules.Settings import Settings
+from discordbot.Modules.Storage import Storage
 
 
 class DiscordBot(Bot):
