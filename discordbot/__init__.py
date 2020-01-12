@@ -17,7 +17,7 @@ class DiscordBot(Bot):
         super().__init__(command_prefix=self.config.get_setting('bot', 'prefix', 'BOT_PREFIX', '!'))
 
     def load_modules(self):
-        paths = [os.path.normpath(os.path.dirname(__file__) + "/Modules"), 'Modules']
+        paths = ['discordbot/Modules', 'Modules']
 
         modules = []
         for path in paths:
@@ -41,6 +41,7 @@ class DiscordBot(Bot):
                         else:
                             loader[item.lower()] = {'deps': None, 'cog': cog}
         loaded = []
+        print(loader)
         while True:
             if len(loader.keys()) == 0:
                 break
