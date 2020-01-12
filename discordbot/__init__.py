@@ -23,7 +23,7 @@ class DiscordBot(Bot):
         self.add_cog(Settings(self))
 
     def load_modules(self):
-        paths = [os.path.normpath(os.getcwd() + '\Modules'), "./Modules"]
+        paths = ["./Modules"]
 
         modules = []
         for path in paths:
