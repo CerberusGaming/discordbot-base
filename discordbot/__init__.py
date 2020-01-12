@@ -1,5 +1,6 @@
 import os
 import importlib
+import inspect
 from glob import glob
 from discord.ext.commands.bot import Bot
 from discord.ext.commands import CogMeta, Cog
@@ -8,7 +9,7 @@ from .Common.config import Config
 
 
 class DiscordBot(Bot):
-    def __init__(self, debug=True):
+    def __init__(self, debug=False):
         self.config = Config()
         self.config.init_module('bot', defaults={'prefix': '', 'token': '!'})
         self.debug = debug
@@ -16,7 +17,7 @@ class DiscordBot(Bot):
         super().__init__(command_prefix=self.config.get_setting('bot', 'prefix', 'BOT_PREFIX', '!'))
 
     def load_modules(self):
-        paths = ['discordbot/Modules', 'Modules']
+        paths = [os.path.normpath(os.path.dirname(__file__) + "/Modules"), 'Modules']
 
         modules = []
         for path in paths:
@@ -62,8 +63,6 @@ class DiscordBot(Bot):
                         del loader[name]
         del loader
         return loaded
-
-        # self.add_cog(cog(self))
 
     def run(self, *args, **kwargs):
         modules = self.load_modules()
