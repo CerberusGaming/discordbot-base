@@ -22,12 +22,8 @@ class DiscordBot(Bot):
         self.add_cog(Storage(self))
         self.add_cog(Settings(self))
 
-    def load_modules(self):
-        paths = ["./Modules"]
-
-        modules = []
-        for path in paths:
-            modules.extend([os.path.normpath(x) for x in glob("{}/*/__init__.py".format(path))])
+    def load_modules(self, path: str = "./Modules"):
+        modules = [os.path.normpath(x) for x in glob("{}/*/__init__.py".format(path))]
 
         loader = {}
         for module in modules:
@@ -73,5 +69,5 @@ class DiscordBot(Bot):
     def run(self, *args, **kwargs):
         self.load_modules()
         if self.debug:
-            print("Loaded: {}".format(",".join(self.cogs)))
+            print("Loaded: {}".format(", ".join(self.cogs)))
         super().run(self.config.get_setting('bot', 'token', 'BOT_TOKEN', ''), *args, **kwargs)
