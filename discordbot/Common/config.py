@@ -25,11 +25,11 @@ class Config():
     def init_module(self, module: str, defaults: dict = None):
         if defaults is None:
             defaults = {}
-        module = module.lower()
+
         if not self._cp.has_section(module):
             self._cp.read_dict({module: defaults})
             self._write()
-        elif len([x for x in self._cp.options(module) if x in defaults.keys()]) > 0:
+        elif False in [self._cp.has_option(module, x) for x in defaults.keys()]:
             for key, value in defaults.items():
                 if not self._cp.has_option(module, key):
                     self._cp.set(module, key, value)

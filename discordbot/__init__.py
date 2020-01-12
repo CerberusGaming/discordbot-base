@@ -15,7 +15,9 @@ class DiscordBot(Bot):
         self.debug = debug
 
         self.config = Config()
-        self.config.init_module('bot', defaults={'prefix': '', 'token': '!'})
+        conf_init = self.config.init_module('Bot', defaults={'prefix': '', 'token': '!'})
+        if not conf_init:
+            exit(1)
 
         super().__init__(command_prefix=self.config.get_setting('bot', 'prefix', 'BOT_PREFIX', '!'))
 

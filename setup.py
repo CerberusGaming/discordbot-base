@@ -2,7 +2,7 @@
 from setuptools import setup
 
 setup(name='discordbot',
-      version='1.1.1',
+      version='1.1.2',
       description='Bot Framework for Discord',
       author='DACRepair',
       author_email='DACRepair@gmail.com',
