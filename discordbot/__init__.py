@@ -66,8 +66,9 @@ class DiscordBot(Bot):
         del loader
         return loaded
 
-    def run(self, *args, **kwargs):
-        self.load_modules()
+    def run(self, load: bool = False, *args, **kwargs):
+        if load:
+            self.load_modules()
         if self.debug:
             print("Loaded: {}".format(", ".join(self.cogs)))
         super().run(self.config.get_setting('bot', 'token', 'BOT_TOKEN', ''), *args, **kwargs)
