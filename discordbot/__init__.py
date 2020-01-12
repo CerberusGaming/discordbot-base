@@ -24,6 +24,8 @@ class DiscordBot(Bot):
 
     def load_modules(self, path: str = "./Modules"):
         modules = [os.path.normpath(x) for x in glob("{}/*/__init__.py".format(path))]
+        if self.debug:
+            print(modules)
 
         loader = {}
         for module in modules:
