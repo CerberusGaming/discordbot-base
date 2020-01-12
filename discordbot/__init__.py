@@ -49,6 +49,9 @@ class DiscordBot(Bot):
                             loader[item.lower()] = {'deps': [x.lower() for x in getattr(cog, 'deps')], 'cog': cog}
                         else:
                             loader[item.lower()] = {'deps': None, 'cog': cog}
+
+        if self.debug:
+            print(loader)
         loaded = []
         while True:
             if len(loader.keys()) == 0:
