@@ -8,13 +8,15 @@ from .Common.config import Config
 
 
 class DiscordBot(Bot):
-    def __init__(self):
+    def __init__(self, debug=True):
         self.config = Config()
         self.config.init_module('bot', defaults={'prefix': '', 'token': '!'})
+        self.debug = debug
+
         super().__init__(command_prefix=self.config.get_setting('bot', 'prefix', 'BOT_PREFIX', '!'))
 
     def load_modules(self):
-        paths = ['App/Modules', 'Modules']
+        paths = ['discordbot/Modules', 'Modules']
 
         modules = []
         for path in paths:
@@ -64,5 +66,7 @@ class DiscordBot(Bot):
         # self.add_cog(cog(self))
 
     def run(self, *args, **kwargs):
-        self.load_modules()
+        modules = self.load_modules()
+        if self.debug:
+            print(modules)
         super().run(self.config.get_setting('bot', 'token', 'BOT_TOKEN', ''), *args, **kwargs)
