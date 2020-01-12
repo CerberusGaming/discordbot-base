@@ -2,7 +2,7 @@
 from setuptools import setup
 
 setup(name='discordbot-base',
-      version='1.0',
+      version='1.0.1',
       description='Bot Framework for Discord',
       author='DACRepair',
       author_email='DACRepair@gmail.com',
@@ -11,4 +11,7 @@ setup(name='discordbot-base',
           'discord.py',
           'sqlalchemy'
       ],
-      packages=['App'])
+      packages=['.Common',
+                '.Modules',
+                '.Modules.Settings',
+                '.Modules.Storage'])
