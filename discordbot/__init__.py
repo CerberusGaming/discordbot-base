@@ -11,13 +11,9 @@ from discordbot.Modules.Storage import Storage
 
 
 class DiscordBot(Bot):
-    def __init__(self, debug=False):
-        self.debug = debug
-
+    def __init__(self):
         self.config = Config()
-        conf_init = self.config.init_module('Bot', defaults={'prefix': '!', 'token': ''})
-        if not conf_init:
-            exit(1)
+        self._can_run = not self.config.init_module('Bot', defaults={'prefix': '!', 'token': ''})
 
         super().__init__(command_prefix=self.config.get_setting('bot', 'prefix', 'BOT_PREFIX', '!'))
 
@@ -69,4 +65,5 @@ class DiscordBot(Bot):
         return loaded
 
     def run(self, *args, **kwargs):
-        super().run(self.config.get_setting('bot', 'token', 'BOT_TOKEN', ''), *args, **kwargs)
+        if self._can_run:
+            super().run(self.config.get_setting('bot', 'token', 'BOT_TOKEN', ''), *args, **kwargs)
