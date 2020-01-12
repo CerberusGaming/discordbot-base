@@ -72,4 +72,6 @@ class DiscordBot(Bot):
 
     def run(self, *args, **kwargs):
         self.load_modules()
+        if self.debug:
+            print("Loaded: {}".format(",".join(self.cogs)))
         super().run(self.config.get_setting('bot', 'token', 'BOT_TOKEN', ''), *args, **kwargs)
