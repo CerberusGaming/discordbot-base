@@ -29,9 +29,6 @@ class DiscordBot(Bot):
         for path in paths:
             modules.extend([os.path.normpath(x) for x in glob("{}/*/__init__.py".format(path))])
 
-        if self.debug:
-            print(modules)
-
         loader = {}
         for module in modules:
             module = module.replace("\\", "/").replace("//", "/").replace("/__init__.py", '').split('/')
@@ -49,9 +46,6 @@ class DiscordBot(Bot):
                             loader[item.lower()] = {'deps': [x.lower() for x in getattr(cog, 'deps')], 'cog': cog}
                         else:
                             loader[item.lower()] = {'deps': None, 'cog': cog}
-
-        if self.debug:
-            print(loader)
         loaded = []
         while True:
             if len(loader.keys()) == 0:
