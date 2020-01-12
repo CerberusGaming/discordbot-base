@@ -23,9 +23,7 @@ class DiscordBot(Bot):
         self.add_cog(Settings(self))
 
     def load_modules(self, path: str = "./Modules"):
-        modules = [x for x in glob("{}/*/__init__.py".format(path))]
-        if self.debug:
-            print(modules)
+        modules = [os.path.normpath(x) for x in glob("{}/*/__init__.py".format(path))]
 
         loader = {}
         for module in modules:
@@ -41,16 +39,15 @@ class DiscordBot(Bot):
                             # Module Collision
                             del loader[item]
                         elif hasattr(cog, 'deps'):
-                            loader[item.lower()] = {'deps': [x.lower() for x in getattr(cog, 'deps')], 'cog': cog}
+                            loader[item] = {'deps': [x for x in getattr(cog, 'deps')], 'cog': cog}
                         else:
-                            loader[item.lower()] = {'deps': None, 'cog': cog}
+                            loader[item] = {'deps': None, 'cog': cog}
         loaded = []
         while True:
             if len(loader.keys()) == 0:
                 break
             loop = loader.copy()
             for name, value in loop.items():
-                name = name.lower()
                 if value['deps'] is None:
                     cog = value['cog']
                     self.add_cog(cog(self))
@@ -59,8 +56,9 @@ class DiscordBot(Bot):
                 else:
                     deps = value['deps']
                     deps.sort()
-                    loaded.sort()
-                    if deps == loaded:
+                    check = [x for x in self.cogs.keys() if x in deps]
+                    check.sort()
+                    if deps == check:
                         cog = value['cog']
                         self.add_cog(cog(self))
                         loaded.append(name)
@@ -68,9 +66,5 @@ class DiscordBot(Bot):
         del loader
         return loaded
 
-    def run(self, load: bool = False, *args, **kwargs):
-        if load:
-            self.load_modules()
-        if self.debug:
-            print("Loaded: {}".format(", ".join(self.cogs)))
+    def run(self, *args, **kwargs):
         super().run(self.config.get_setting('bot', 'token', 'BOT_TOKEN', ''), *args, **kwargs)
