@@ -25,7 +25,7 @@ class DiscordBot(Bot):
         self.load_modules()
 
     def load_modules(self):
-        paths = ['discordbot/Modules', 'Modules']
+        paths = [os.path.normpath(os.getcwd() + '\Modules'), "./Modules"]
 
         modules = []
         for path in paths:
