@@ -11,15 +11,17 @@ from .Modules import Settings, Storage
 
 class DiscordBot(Bot):
     def __init__(self, debug=False):
-        self.config = Config()
-        self.config.init_module('bot', defaults={'prefix': '', 'token': '!'})
         self.debug = debug
 
-        super().__init__(command_prefix=self.config.get_setting('bot', 'prefix', 'BOT_PREFIX', '!'))
+        self.config = Config()
+        self.config.init_module('bot', defaults={'prefix': '', 'token': '!'})
 
-    def _load_internal_modules(self):
         self.add_cog(Storage(self))
         self.add_cog(Settings(self))
+
+        self.load_modules()
+
+        super().__init__(command_prefix=self.config.get_setting('bot', 'prefix', 'BOT_PREFIX', '!'))
 
     def load_modules(self):
         paths = ['discordbot/Modules', 'Modules']
@@ -46,7 +48,6 @@ class DiscordBot(Bot):
                         else:
                             loader[item.lower()] = {'deps': None, 'cog': cog}
         loaded = []
-        print(loader)
         while True:
             if len(loader.keys()) == 0:
                 break
@@ -71,8 +72,4 @@ class DiscordBot(Bot):
         return loaded
 
     def run(self, *args, **kwargs):
-        self._load_internal_modules()
-        modules = self.load_modules()
-        if self.debug:
-            print(modules)
         super().run(self.config.get_setting('bot', 'token', 'BOT_TOKEN', ''), *args, **kwargs)
